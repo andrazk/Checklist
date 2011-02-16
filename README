@@ -1,0 +1,12 @@
+Project for my diploma, based on HTML5 APIs
+
+Dependencies:
+
+persistence.js
+https://github.com/zefhemel/persistencejs
+
+mootools
+http://mootools.net/
+
+socket.io
+http://socket.io/
