@@ -16,9 +16,9 @@ var Socket = new Class({
         this.setOptions(options);
         //set events
         this.addEvent('onConnect', function(data){
-
-        }),
-        this.socket = new io.Socket(this.options.host, {port: this.options.port}),
+            core.fireEvent('socketConnected', data);
+        });
+        this.socket = new io.Socket(this.options.host, {port: this.options.port});
         this.connect(),
         this.socket.on('connect', this.onConnect),
         this.socket.on('message', this.onMessage),
@@ -37,22 +37,31 @@ var Socket = new Class({
     },
     onMessage: function(msg){
         switch(msg.res){
-            case 'sync':
-                console.log('Sync response', msg);
-                core.fireEvent('newSyncData', msg.data);
-                break;
             case 'broadcast':
                 console.log('Broadcast response', msg);
-                core.fireEvent('newRemoteProject', msg.data.iid);
+                //core.fireEvent('newRemote'+msg.data.type, msg.data.iid);
+                core.fireEvent('newRemoteLog', msg.data);
+                break;
+            case 'syncUsers':
+                core.fireEvent('syncUsers', msg.data);
+                break;
+            case 'logSaved':
+                console.log('Log Saved', msg);
+                core.fireEvent('logSaved', msg.data);
                 break;
             default:
                 console.log('Unknown response', msg);
         }
     },
     send: function(req, data){
+        // TODO: čakalna vrsta in callback funkcije ob uspešni dostavi.
         this.socket.send({
             req: req,
             data: data
         })
+    },
+    broadcast: function(log){
+        var self = this;
+        this.send('broadcast', log);
     }
 });
