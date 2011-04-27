@@ -18,43 +18,49 @@
 }
 
 .lightface .centerLeft, .lightface .centerRight {
-
+	width: 10px;
 	height: auto;
+	background-image: url(b.png);
+	background-repeat: repeat-y;
 }
 
 .lightface .topLeft, .lightface .topRight, .lightface .bottomLeft, .lightface .bottomRight {
-
+	width: 10px;
+	height: 10px;
+	background-repeat: no-repeat;
 }
 
 .lightface .topLeft {
-	
+	background-image: url(tl.png);
+	background-position: top left;
 }
 
 .lightface .topRight {
-
+	background-image: url(tr.png);
+	background-position: top right;
 }
 
 .lightface .bottomLeft {
-
+	background-image: url(bl.png);
+	background-position: bottom left;
 }
 
 .lightface .bottomRight {
-
+	background-image: url(br.png);
+	background-position: bottom right;
 }
 
 .lightface .topCenter, .lightface .bottomCenter {
-	
-
-}
-
-.lightface .centerCenter {	
+	width: auto;
+	height: 10px;
+	background-image: url(b.png);
+	background-repeat: repeat-x;
 }
 
 .lightface .lightfaceContent {
 	background-color: #fff;
 	border: 1px solid #555;
 	position: relative;
-	box-shadow: 3px 3px 3px #888;
 }
 
 .lightface .loading {
@@ -68,7 +74,6 @@
 	background-color: #6d84b4;
 	border: 1px solid #3b5998;
 	font-weight: bold;
-	text-shadow: #000 1px 1px 1px;
 	margin: -1px;
 	margin-bottom: 0;
 	padding: 5px 10px;
