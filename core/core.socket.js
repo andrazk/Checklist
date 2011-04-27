@@ -54,7 +54,7 @@ var Socket = new Class({
         }
     },
     send: function(req, data){
-        // TODO: čakalna vrsta in callback funkcije ob uspešni dostavi.
+        // TODO: Čakalna vrsta in callback funkcije ob uspešni dostavi.
         this.socket.send({
             req: req,
             data: data
@@ -65,3 +65,8 @@ var Socket = new Class({
         this.send('broadcast', log);
     }
 });
+
+var core = core || {};
+core.socket = function(){
+	
+}();

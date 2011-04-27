@@ -1,64 +1,37 @@
-var module = (window && window.module) ? window.module : {};
-module.StatusBar = new Class({
-
-    //implements
-    Implements: [Options, Events],
-
-    //options
-    options: {
-        name: 'status-bar',
-        box: $$('body'),
-        frame: new Element('div', {id: this.name})
-    },
-
-    //initialization
-    initialize: function(options) {
-        var self = this;
-        this.setOptions(options);
-        this.tmpInit(function(){
-
-        });
-
-        this.addEvents({
-            'newProject': function(data){
-                var self = this;
-                
-            }
-        });
-
-    },
-
-    addUser: function(){
-        var user = new User({
-            email: prompt('Enter email'),
-            password: prompt('Enter password')
-        });
-        core.fireEvent('newUser', user);
-    },
-
-
-    //Templatzes
-    tmpInit: function(callback){
-        var self = this;
-        this.el = {};
-        this.options.box.adopt(this.options.frame);
-        /////////
-        self.tmpAddUserLink(this.options.frame);
-        ////////
-        callback();
-    },
-    tmpAddUserLink: function(frame){
-        var self = this;
-        var a = new Element('a', {
-            html: 'New User',
-            href: '#',
-            events: {
-                click: function(e){
-                    e.stop();
-                    self.addUser();
-                }
-            }
-        }).inject(frame);
-    }
-
-});
+var module = module || {};
+module.statusBar = function(){
+	
+	return {
+		name: 'status-bar',
+		box: $$('body'),
+		frame: new Element('div', {id: this.name}),
+		
+		init: function(options){
+			box = options.box || box;
+			this.draw();
+			
+		},
+		
+		draw: function(){
+			var html = '<h1>Checklist</h1>';
+			if(core.user.auth()){
+				html += 'Pozdravljen ' + core.user.username;
+				html += '<a href="?action=logout">odjava</a>';
+			}else{
+				html += '<a href="?dialog=login" rel="dialog">Prijava</a><a href="register" rel="dialog">Registracija</a>';
+			}
+			box.innerHTML = html;
+		},
+		
+		notify: function(type, data){
+			switch(type){
+				case 'login':
+					this.draw();
+					return;
+				case 'logout':
+					this.draw();
+					return;
+			};
+		}
+	};
+}();

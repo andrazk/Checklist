@@ -1,58 +1,32 @@
-var UserClass = new Class({
-
-    //implements
-    Implements: [Options, Events],
-
-    //options
-    options: {
-
-    },
-    data: {}, //user email
-
-
-    //initialization
-    initialize: function(options) {
-        //set options
-        this.setOptions(options);
-        //set events
-        this.addEvents({
-            'usersSynced': function(data){
-                this.get(function(uid){
-                    if(uid) core.fireEvent('userAuth', uid);
-                });
-                
-            }
-        });
-        //
-        var uid = sessionStorage.getItem('user');
-        if(uid) console.log(uid+' pozdravljen!!!');
-    },
-
-    login: function(callback){
-        var email = prompt('Enter email');
-        User.findBy('email', email, function(user){
-            if(user){
-                sessionStorage.setItem('user', user.email);
-                this.data = user;
-                core.fireEvent('userLoggedIn', user.email);
-                if(callback) callback(user.email);
-            }else{
-                alert('User doesnt exist!');
-                if(callback) callback(false);
-            }
-        });
-    },
-
-    logout: function(){
-        var self = this;
-        this.data = {};
-        sessionStorage.setItem('user', '');
-    },
-
-    get: function(callback){
-        var self = this;        
-        var uid = sessionStorage.getItem('user');
-        if(uid) callback(uid);
-        else self.login(callback);
-    }
-});
+var core = core || {};
+core.user = function(){
+	return {
+		//ATRIBUTES
+		username: localStorage.getItem('username') || '',
+		
+		//METHODS
+		login: function(username, password, success, error){
+			localStorage.setItem('username', username);
+			//TODO autorizacija s strežnikom
+			this.username = username;
+			if(success) success('Pozdravljen '+username);
+			
+			//if(error) error();
+			
+			core.notify('login', {
+				username: username
+			});
+		},
+		
+		logout: function(){
+			localStorage.removeItem('username');
+			core.notify('logout');
+		},
+		
+		auth: function(){
+			var username = localStorage.getItem('username');
+			if(username) return true;
+			return false;
+		}
+	};
+}();

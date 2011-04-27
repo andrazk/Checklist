@@ -30,13 +30,12 @@ persistence.schemaSync(function(tx){
 
 
 
-//MODUKLES
-var core = {};
+//MODULES
+var core = core || {};
 core.initialize = function(){
-    core.socket = new Socket();
+    //core.socket = new Socket();
     core.sync = new Sync();
-    core.user = new UserClass();
-}
+};
 
 core.reset =function(){
     core.user.logout();
@@ -53,14 +52,43 @@ core.reset =function(){
     });
     
     core.sync.reset();
-}
+};
 
 
-var modules = [];
+
+
+var modules = {};
+
+core.register = function(id, module){
+	id = id ? id : modules.length;
+	modules[id] = module;
+	return id;
+};
+
+core.start = function(id, options){
+	modules[id].init(options);
+};
+
+
+//INTRO
+
+core.register('status', module.statusBar);
+core.register('dialog', module.dialog);
+
+core.notify = function(type, data){
+	for(var id in modules){
+		modules[id].notify(type, data);
+	}
+};
+
+core.start('dialog');
+
 document.addEvent('domready', function(){
+	
+	core.start('status', {box: core.$('box')});
 
-    modules[0] = new module.ProjectList({box: $('box')});
-    modules[1] = new module.StatusBar({box: $('box')});
+    //modules[0] = new module.ProjectList({box: $('box')});
+    //modules[1] = new module.StatusBar({box: $('box')});
     core.fireEvent = function(type, args, delay){
 
         core.sync.fireEvent(type, args, delay);
@@ -70,8 +98,8 @@ document.addEvent('domready', function(){
         modules[0].fireEvent(type, args, delay);
         modules[1].fireEvent(type, args, delay);
         
-        console.log('Event fired: ', type, args);
-    }
+        core.log('Event fired: ', type, args);
+    };
 });
 
 
