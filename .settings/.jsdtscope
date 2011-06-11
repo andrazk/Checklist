@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="src" path="core"/>
-	<classpathentry excluding="lightface/" kind="src" path="lib"/>
-	<classpathentry kind="src" path="lib/lightface"/>
-	<classpathentry kind="src" path="module"/>
-	<classpathentry kind="con" path="org.eclipse.wst.jsdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="output" path=""/>
-</classpath>
