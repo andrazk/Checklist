@@ -1,10 +1,11 @@
 !!! 5
-html
+html(manifest='#{manifest}')
 	head
 		meta(charset= 'UTF-8')
 		title HTML5 Checklist
 		link(rel='stylesheet', href='/style/style.css')
 		link(rel='stylesheet', href='/style/lightface.css')
+		link(rel='shortcut icon', href='/favicon.ico')
 		script(type= 'text/javascript', src='/lib/modernizr-1.7.min.js')    
 	body
 		#container
@@ -17,8 +18,8 @@ html
 				aside#right
 			footer#footer
 				a#html5badge(href="http://www.w3.org/html/logo/")
-					img(src="http://www.w3.org/html/logo/badge/html5-badge-h-connectivity-css3-device-performance-semantics-storage.png", width="293", height="64", alt="HTML5 Powered with Connectivity / Realtime, CSS3 / Styling, Device Access, Performance &amp; Integration, Semantics, and Offline &amp; Storage", title="HTML5 Powered with Connectivity / Realtime, CSS3 / Styling, Device Access, Performance &amp; Integration, Semantics, and Offline &amp; Storage")
+					img(src="/style/html5-badge.png", width="293", height="64", alt="HTML5 Powered with Connectivity / Realtime, CSS3 / Styling, Device Access, Performance &amp; Integration, Semantics, and Offline &amp; Storage", title="HTML5 Powered with Connectivity / Realtime, CSS3 / Styling, Device Access, Performance &amp; Integration, Semantics, and Offline &amp; Storage")
 				div#disclamer © 2011 Andraž Krašček&nbsp;|&nbsp; 
 					a.follow.blank(href="https://github.com/andrazk/Checklist") GitHub
 		- each item in resources
-			script(type= 'text/javascript', src= item)		
+			script(type= 'text/javascript', src="/#{item}")		

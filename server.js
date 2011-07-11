@@ -1,34 +1,55 @@
+/**
+ * CONFIG
+ */
+
+var PORT = 80;
+var DB_HOST = 'localhost';
+var DB_PORT = 3306;
+var DB_USER = 'root';
+var DB_PASSWORD = '';
+var DB_DATABASE = 'checklist';
+var MANIFEST = 'cache6.manifest';
+
+/**
+ * NO CHANGES BEYOND THIS POINT
+ * unless you know what you're doing!!!
+ */
+
 var resources = [
-'http://checklist.no.de/socket.io/socket.io.js',
 // Dependencies
-'/lib/persistence.js',
-'/lib/persistence.store.sql.js',
-'/lib/persistence.store.websql.js',
-'https://ajax.googleapis.com/ajax/libs/mootools/1.3.0/mootools-yui-compressed.js',
-'/lib/lightface/LightFace.js',
-'/lib/mustache.js',
-'/lib/form2object.js',
+'lib/socket.io.js',
+'lib/persistence.js',
+'lib/persistence.store.sql.js',
+'lib/persistence.store.websql.js',
+'lib/mootools-yui-compressed.js',
+'lib/lightface/LightFace.js',
+'lib/mustache.js',
+'lib/form2object.js',
 // CORE
-'/core/core.sync.js',
-'/core/core.socket.js',
-'/core/core.user.js',
-'/core/core.log.js',
-'/core/core.dom.js',
-'/core/core.history.js',
-'/core/core.db.js',
+'core/core.sync.js',
+'core/core.socket.js',
+'core/core.user.js',
+'core/core.log.js',
+'core/core.dom.js',
+'core/core.history.js',
+'core/core.db.js',
+'core/core.misc.js',
 // MODULES
-'/module/dialog.js',
-'/module/statusbar.js',
-'/module/projects.js',
-'/module/welcome.js',
-'/module/project.js',
-'/module/log.js',
-'/core/core.js'
+'module/dialog.js',
+'module/statusbar.js',
+'module/projects.js',
+'module/welcome.js',
+'module/project.js',
+'module/log.js',
+'core/core.js'
 ];
+
+
+
 
 var persistence = require('./persistence.js').persistence;
 var persistenceStore = require('./persistence.store.mysql');
-persistenceStore.config(persistence, 'external-db.s126904.gridserver.com', 3306, 'db126904_checklist', 'db126904', 'ye6tn4ny');
+persistenceStore.config(persistence, DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD);
 var Log, Project, User, Task, Comment;  	
 Project = persistence.define('Project',{
     name: "TEXT",
@@ -50,7 +71,7 @@ User = persistence.define('User', {
     surname: "TEXT",
     password: "TEXT"
 });
-User.index('username',{unique:true});
+User.index('username', {unique:true});
 
 Task = persistence.define('Task', {
 	pid: "TEXT", //Project ID
@@ -66,26 +87,19 @@ Comment = persistence.define('Comment', {
 });
 
 var session = persistenceStore.getSession();
-
 var help = require('./helpers.js');
 
-
-
-
-
-session.transaction(function(tx) {
-    
+session.transaction(function(tx) {    
     session.schemaSync(tx, function(){
         session.close();
-    });    
-    
+    });        
 });
 
 
 
 /**
  * Save new entry to log
- * @param entity Dotična entiteta
+ * @param entity Doticna entiteta
  * @param logObject Log Object options
  * @param cb Callback function
  */
@@ -238,7 +252,7 @@ socket.on('connection', function(client){
 			//Ustvari sejo
 			var session = persistenceStore.getSession();
 			session.transaction(function(tx){
-				//TODO: Ni potrebno vedno ustvarjati nove entite, Včasih se loada iz baze.
+				//TODO: Ni potrebno vedno ustvarjati nove entite, Vcasih se loada iz baze.
 				createEntity(session, tx, log, obj, function(err, entity){
 					var logObject = {
 						lid: log.id,
@@ -307,7 +321,7 @@ socket.on('connection', function(client){
 					console.log('Sync To Local Count', results.length);
 					var latest = [];
 					//Getlast
-					//TODO: Poišči zadnje vpise.
+					//TODO: Poišci zadnje vpise.
 					var session = persistenceStore.getSession();
 					session.transaction(function(tx){
 						help.aEach(results, function(log, cb){
@@ -326,7 +340,7 @@ socket.on('connection', function(client){
 			});
 		}
 	});
-	client.on('disconnect', function(){}); 
+	//client.on('disconnect', function(){}); 
 });
 
 /**
@@ -367,7 +381,7 @@ var loadUser = function(req, res, next){
 	var session = persistenceStore.getSession();
 	session.transaction(function(tx) {
 		User.findBy(session, tx, 'username', req.params.username, function(user){
-			
+			session.close();
 			if(user){
 				req.user = user;
 				console.log('User Loaded', user.username);
@@ -383,7 +397,7 @@ var loadUser = function(req, res, next){
 				next(new Error('Failed to load user ' + req.params.username));
 			}
 			*/
-			session.close();
+			
 		});
 	});
 }; 
@@ -430,27 +444,58 @@ app.get('/user/register/:username/:password/:name/:surname?', loadUser, function
 			};
 			saveLog(session, tx, user, logObject, function(sLog, sEntity){
 				//Hide password
-				log.iid.password = null;
+				sLog.iid.password = null;
 				res.contentType('json');
-				res.send(log);
+				res.send(sLog);
 				//broadcast('newuser', log);
 				self.broadcast({type: sLog.action+sLog.type, data: sLog, object: sEntity});
-				session.close();
-				
-			});
-			
+				session.close();				
+			});			
 		});
 	});
 });
 
 var indexRender = function(req, res){
-	res.render('index.jade', {locals: {resources: resources}, layout: false});
+	res.render('index.jade', {locals: {resources: resources, manifest: MANIFEST}, layout: false});
 };
 
 app.get('/', indexRender);
 app.get('/intro', indexRender);
 app.get('/projects', indexRender);
 app.get('/project/*', indexRender);
+
+app.get('/'+MANIFEST, function(req, res){
+	res.header("Content-Type", "text/cache-manifest");
+	var manifest = '\CACHE MANIFEST\n\
+		/\n\
+		/intro\n\
+		/projects\n\
+		style/style.css\n\
+			style/lightface.css\n\
+			style/button.png\n\
+			style/fbloader.gif\n\
+			style/icons.png\n\
+			style/html5-badge.png\n\
+			workers/render.js\n\
+			lib/modernizr-1.7.min.js\n';
+	for(var i=0; i<resources.length; i++){
+		manifest += resources[i]+'\n';
+	}
+	res.send(manifest + 'FALLBACK:\n/ /intro\n');
+	/**
+	res.render('manifest.jade', {locals: {resources: resources}, layout: false});
+	
+	/**
+	 * 
+	 * , function(render){
+		
+		//res.header("Content-Type", "text/cache-manifest");
+		res.send(render);
+		
+	}
+	*/
+	 
+});
 /**
  * ERROR HANDLER
  */
@@ -458,4 +503,8 @@ app.error(function(err, req, res, next){
 	res.send(err);
 });
 
-app.listen(80);
+app.listen(PORT);
+
+process.on('uncaughtException', function(err) {
+  console.log(err);
+});
