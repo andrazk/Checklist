@@ -1,5 +1,7 @@
 Project for my diploma, based on HTML5 APIs
 
+Check server.js for configuration.
+
 Dependencies:
 
 persistence.js
